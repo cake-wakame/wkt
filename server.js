@@ -3,13 +3,13 @@ const express = require("express");
 const path = require("path");
 const compression = require("compression");
 const bodyParser = require("body-parser");
-const YouTubeJS = require("youtubei.js");
 const serverYt = require("./server/youtube.js");
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 
 let app = express();
 let client;
+let YouTubeJS;
 
 app.use(compression());
 app.use(express.static(__dirname + "/public"));
@@ -88,6 +88,7 @@ const listener = app.listen(process.env.PORT || 3000, '0.0.0.0', () => {
 
 async function initInnerTube() {
   try {
+    YouTubeJS = await import("youtubei.js");
     client = await YouTubeJS.Innertube.create({ lang: "ja", location: "JP"});
     serverYt.setClient(client);
     console.log("YouTube client initialized successfully");
