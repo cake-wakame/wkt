@@ -81,17 +81,22 @@ app.use((req, res) => {
   });
 });
 app.on("error", console.error);
+
+const listener = app.listen(process.env.PORT || 3000, '0.0.0.0', () => {
+  console.log(process.pid, "Ready.", listener.address().port);
+});
+
 async function initInnerTube() {
   try {
     client = await YouTubeJS.Innertube.create({ lang: "ja", location: "JP"});
     serverYt.setClient(client);
-    const listener = app.listen(process.env.PORT || 3000, () => {
-      console.log(process.pid, "Ready.", listener.address().port);
-    });
+    console.log("YouTube client initialized successfully");
   } catch (e) {
-    console.error(e);
-    setTimeout(initInnerTube, 10000);
-  };
-};
+    console.error("YouTube client initialization failed:", e.message);
+    console.log("Server running without YouTube features. Retrying in 30s...");
+    setTimeout(initInnerTube, 30000);
+  }
+}
+
 process.on("unhandledRejection", console.error);
 initInnerTube();
